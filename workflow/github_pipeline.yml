@@ -1,0 +1,12 @@
+name: CI Pipeline
+on: [push] # Triggers on every push to the repository
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        
+      - name: Run a script
+        run: echo "Hello, GitHub Actions!"
