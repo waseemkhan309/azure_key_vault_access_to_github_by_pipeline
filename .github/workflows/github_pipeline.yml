@@ -30,7 +30,7 @@ jobs:
         with:
           inlineScript: |
             SECRET_VALUE=$(az keyvault secret show --name Test --vault-name ${{ secrets.KEYVAULT_NAME }} --query value -o tsv)
-            echo "::add-mask::$SECRET_VALUE"
+            
             echo $SECRET_VALUE
             echo "SECRET_VALUE=$SECRET_VALUE" >> $GITHUB_ENV
       - name: Use retrieved secret
