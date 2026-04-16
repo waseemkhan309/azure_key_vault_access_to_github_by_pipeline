@@ -28,7 +28,7 @@ jobs:
         run: |
           SECRET_VALUE=$(az keyvault secret show \
             --vault-name ${{ secrets.KEYVAULT_NAME }} \
-            --name MySecret \
+            --name Test \
             --query value -o tsv)
 
           echo "Secret fetched successfully"
