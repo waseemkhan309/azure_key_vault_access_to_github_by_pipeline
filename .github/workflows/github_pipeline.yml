@@ -1,4 +1,4 @@
-name: Access Azure Key Vault and pass secret to workflow
+name: Access Azure Key Vault using OIDC
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  id-token: write
+  id-token: write   # REQUIRED for OIDC
   contents: read
 
 jobs:
@@ -14,29 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Azure Login
-        uses: azure/login@v1
+      - name: Azure Login using OIDC
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Retrieve secret from Key Vault
-        id: keyvault
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            SECRET_VALUE=$(az keyvault secret show --name <SECRET_NAME> --vault-name ${{ secrets.KEYVAULT_NAME }} --query value -o tsv)
-            echo "::add-mask::$SECRET_VALUE"
-            echo "SECRET_VALUE=$SECRET_VALUE" >> $GITHUB_ENV
-      - name: Use retrieved secret
-        run: echo "The secret is successfully retrieved!"
-
-      - name: Use SECRET_VALUE in deployment
+      - name: Get secret from Key Vault
         run: |
-          ./deploy.sh
-        env:
-          SECRET_VALUE: ${{ env.SECRET_VALUE }}
+          SECRET_VALUE=$(az keyvault secret show \
+            --vault-name ${{ secrets.KEYVAULT_NAME }} \
+            --name MySecret \
+            --query value -o tsv)
+
+          echo "Secret fetched successfully"
